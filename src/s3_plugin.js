@@ -162,14 +162,18 @@ module.exports = class S3Plugin {
 
     allHtml = htmlFiles.length ? this.addPathToFiles(htmlFiles, directory).concat(files) : files
     this.cdnizerOptions.files = allHtml.map(({name}) => `*${name}*`)
-    this.cdnizer = cdnizer(this.cdnizerOptions)
 
-    var [cdnizeFiles, otherFiles] = _(allHtml)
-      .uniq('name')
-      .partition((file) => /\.(html)/.test(file.name)) // |css - Add when cdnize css is done
-      .value()
+    return this.transformBasePath()
+      .then(()=>{
+        this.cdnizer = cdnizer(this.cdnizerOptions)
 
-    return Promise.all(cdnizeFiles.map(file => this.cdnizeHtml(file)).concat(otherFiles))
+        var [cdnizeFiles, otherFiles] = _(allHtml)
+          .uniq('name')
+          .partition((file) => /\.(html)/.test(file.name)) // |css - Add when cdnize css is done
+          .value()
+
+        return Promise.all(cdnizeFiles.map(file => this.cdnizeHtml(file)).concat(otherFiles))
+      })
   }
 
   // For future implimentation
