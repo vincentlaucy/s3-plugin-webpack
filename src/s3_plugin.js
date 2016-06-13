@@ -165,6 +165,7 @@ module.exports = class S3Plugin {
 
     return this.transformBasePath()
       .then(()=>{
+        this.cdnizerOptions.defaultCDNBase = addSeperatorToPath(this.cdnizerOptions.defaultCDNBase) + this.options.basePath
         this.cdnizer = cdnizer(this.cdnizerOptions)
 
         var [cdnizeFiles, otherFiles] = _(allHtml)
