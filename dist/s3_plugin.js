@@ -298,6 +298,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 
 	      return this.transformBasePath().then(function () {
+	        _this5.cdnizerOptions.defaultCDNBase = (0, _helpers.addSeperatorToPath)(_this5.cdnizerOptions.defaultCDNBase) + _this5.options.basePath;
 	        _this5.cdnizer = (0, _cdnizer2.default)(_this5.cdnizerOptions);
 
 	        var _$uniq$partition$valu = (0, _lodash2.default)(allHtml).uniq('name').partition(function (file) {
