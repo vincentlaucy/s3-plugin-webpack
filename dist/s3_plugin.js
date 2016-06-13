@@ -190,12 +190,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	          var dPath = (0, _helpers.addSeperatorToPath)(_this.options.directory);
 
 	          _this.getAllFilesRecursive(dPath).then(function (files) {
-	            return _this.handleFiles(files);
+	            return _this.handleFiles(files, cb);
 	          }).then(function () {
 	            return cb();
 	          }).catch(function (e) {
-	            compileError(compilation, 'S3Plugin: ' + e);
-	            cb();
+	            return _this.handleErrors(e, compilation, cb);
 	          });
 	        } else {
 	          _this.getAssetFiles(compilation).then(function (files) {
@@ -203,8 +202,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          }).then(function () {
 	            return cb();
 	          }).catch(function (e) {
-	            compileError(compilation, 'S3Plugin: ' + e);
-	            cb();
+	            return _this.handleErrors(e, compilation, cb);
 	          });
 	        }
 	      });
@@ -219,6 +217,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }).then(function () {
 	        return _this2.invalidateCloudfront();
 	      });
+	    }
+	  }, {
+	    key: 'handleErrors',
+	    value: function handleErrors(error, compilation, cb) {
+	      compileError(compilation, 'S3Plugin: ' + error);
+	      cb();
 	    }
 	  }, {
 	    key: 'getAllFilesRecursive',
@@ -292,23 +296,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var name = _ref2.name;
 	        return '*' + name + '*';
 	      });
-	      this.cdnizer = (0, _cdnizer2.default)(this.cdnizerOptions);
 
-	      var _$uniq$partition$valu = (0, _lodash2.default)(allHtml).uniq('name').partition(function (file) {
-	        return (/\.(html)/.test(file.name)
-	        );
-	      }) // |css - Add when cdnize css is done
-	      .value();
+	      return this.transformBasePath().then(function () {
+	        _this5.cdnizer = (0, _cdnizer2.default)(_this5.cdnizerOptions);
 
-	      var _$uniq$partition$valu2 = _slicedToArray(_$uniq$partition$valu, 2);
+	        var _$uniq$partition$valu = (0, _lodash2.default)(allHtml).uniq('name').partition(function (file) {
+	          return (/\.(html)/.test(file.name)
+	          );
+	        }) // |css - Add when cdnize css is done
+	        .value();
 
-	      var cdnizeFiles = _$uniq$partition$valu2[0];
-	      var otherFiles = _$uniq$partition$valu2[1];
+	        var _$uniq$partition$valu2 = _slicedToArray(_$uniq$partition$valu, 2);
+
+	        var cdnizeFiles = _$uniq$partition$valu2[0];
+	        var otherFiles = _$uniq$partition$valu2[1];
 
 
-	      return Promise.all(cdnizeFiles.map(function (file) {
-	        return _this5.cdnizeHtml(file);
-	      }).concat(otherFiles));
+	        return Promise.all(cdnizeFiles.map(function (file) {
+	          return _this5.cdnizeHtml(file);
+	        }).concat(otherFiles));
+	      });
 	    }
 
 	    // For future implimentation
